@@ -204,3 +204,8 @@ def book_api(isbn):
     "review_count": data["books"][0]["ratings_count"],
     "average_score": data["books"][0]["average_rating"]
     })
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return "seems like you lost in space"
