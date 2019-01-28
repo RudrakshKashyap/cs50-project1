@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+
+{% block title %}Home{% endblock title %}
+
+{% block body %}
+
+    <div class="container" id="mainblock">
+      <div class="jumbotron">
+        <h4 class="centerwale">Hello, {{ name }}</h4>
+        <a href="/logout" ><button type="button" class="btn btn-primary" ><h4>Logout</h4></button></a>
+        <h1>Goodreads</h1>
+        <p>Goodreads is a "social cataloging" website that allows individuals to freely search its database of books, annotations, and reviews.<br>
+        The website's office is located in Room no. 39 of Castel Dio.</p>
+      </div>
+   </div>
+
+
+<div class="container">
+<form class="example" action="/search" method="post" style="margin:auto;">
+ <div class="row-fluid">
+  <input type="text" placeholder="Search.." name="search">
+  <button type="submit"><i class="fa fa-search"></i></button>
+  <select class="selectpicker" name="filter">
+        <option disabled="disabled">Search by</option>
+        <option value="All" selected>All books</option>
+        <option value="isbn">ISBN</option>
+        <option value="title">Title</option>
+        <option value="author">Author</option>
+        <option value="year">Year</option>
+      </select>
+    </div>
+</select>
+</form>
+</div>
+
+
+    <div class="container">
+      <div class="well well-lg">
+  <h1>Some popular books</h1>
+  <h2>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>IBSN</th>
+        <th>TITLE</th>
+        <th>AUTHOR</th>
+        <th>YEAR</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for isbn,title,author,year in books %}
+        <tr>
+          <td><a href="/book/{{ isbn }}">{{ isbn }}</a></td>
+          <td>{{  title  }}</td>
+          <td>{{ author }}</td>
+          <td>{{ year }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </h2>
+</div>
+    </div>
+
+{% endblock body %}

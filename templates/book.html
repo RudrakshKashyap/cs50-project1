@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+
+{% block title %}Home{% endblock title %}
+
+{% block body %}
+
+    <div class="container" id="mainblock">
+      <div class="jumbotron">
+        <h4 class="centerwale">Hello, {{ name }}</h4>
+        <a href="/logout" ><button type="button" class="btn btn-primary" ><h4>Logout</h4></button></a>
+        <h1>Goodreads</h1>
+        <p>Goodreads is a "social cataloging" website that allows individuals to freely search its database of books, annotations, and reviews.<br>
+        The website's office is located in Room no. 39 of Castle Dio.</p>
+        <a href="/home" ><button type="button" class="btn btn-success" style="float: left;"><h4>Home</h4></button></a>
+      </div>
+   </div>
+
+
+    <div class="container">
+      <div class="well well-lg" style="padding-bottom:4%;">
+        <h2>
+        According to <a href="https://www.goodreads.com/">www.goodreads.com</a><br><br>
+        <strong>Book Title: </strong>{{ title }}<br>
+        <strong>Isbn: </strong>{{ isbn }}<br>
+        <strong>Average Rating: </strong>{{ ratings }}<br>
+        <strong>Ratings Count: </strong>{{ ratings_count }}<br>
+        </h2>
+
+      {% if not comment %}
+      <h2 style="padding-top:3%;">
+      <form role="form" action="/insert" method="post">
+        <h1>Rate this book</h1>
+<fieldset class="rating">
+    <input type="radio" id="star5" name="rating" value="5" /><label class = "full" for="star5" title="Awesome - 5 stars"></label>
+    <input type="radio" id="star4half" name="rating" value="4.5" /><label class="half" for="star4half" title="Pretty good - 4.5 stars"></label>
+    <input type="radio" id="star4" name="rating" value="4" /><label class = "full" for="star4" title="Pretty good - 4 stars"></label>
+    <input type="radio" id="star3half" name="rating" value="3.5" /><label class="half" for="star3half" title="Meh - 3.5 stars"></label>
+    <input type="radio" id="star3" name="rating" value="3" /><label class = "full" for="star3" title="Meh - 3 stars"></label>
+    <input type="radio" id="star2half" name="rating" value="2.5" /><label class="half" for="star2half" title="Kinda bad - 2.5 stars"></label>
+    <input type="radio" id="star2" name="rating" value="2" /><label class = "full" for="star2" title="Kinda bad - 2 stars"></label>
+    <input type="radio" id="star1half" name="rating" value="1.5" /><label class="half" for="star1half" title="Meh - 1.5 stars"></label>
+    <input type="radio" id="star1" name="rating" value="1" /><label class = "full" for="star1" title="Sucks big time - 1 star"></label>
+    <input type="radio" id="starhalf" name="rating" value="0.5" /><label class="half" for="starhalf" title="Sucks big time - 0.5 stars"></label>
+</fieldset><br><br>
+        <div class="form-group">
+          Leave your Review:
+          <textarea class="form-control" rows="5" required style="margin-bottom:2%;" name="review"></textarea>
+
+        <button type="submit" class="btn btn-success" style="float: right;"><h5>Submit</h5></button>
+        </div>
+      </form>
+      </h2>
+      </div>
+      {% else %}
+      <h4 style="text-align:center;">your review has been successfully submitted</h4>
+      {% endif %}
+      <div class="col-sm-9" style="padding-top:10%;"><h4><small>RECENT POSTS</small>
+      {% for row in reviews %}
+      <h2>Post by {{ row[3] }}
+      <hr>
+      <span class="glyphicon glyphicon-time"></span> On {{ date }}.
+      <span class="label label-success">Rated {{  row[4]  }} out of 5</span><br>
+      <h2><p style="padding-bottom:10%;">{{  row[1]  }}</p></h2>
+      <hr>
+      </h2>
+      {% endfor %}
+    </div>
+
+{% endblock body %}

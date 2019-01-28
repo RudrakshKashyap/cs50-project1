@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}Login{% endblock title %}
+
+{% block body %}
+    <div class="container" id="mainblock">
+      <div class="jumbotron">
+        <a href="/register" ><button type="button" class="btn btn-primary" ><h4>Register</h4></button></a>
+        <h1>Goodreads</h1>
+        <p>Goodreads is a "social cataloging" website that allows individuals to freely search its database of books, annotations, and reviews.<br>
+        The website's office is located in Room no. 39 of Castle Dio.</p>
+      </div>
+    </div>
+
+
+    <div class="container">
+      <div class="well well-lg">
+        <h1 class="centerwale">Login</h1>
+          {% if error %}
+          <div class="alert alert-danger">
+          <strong>Error!</strong> {{ error }}
+          </div>
+          {% endif %}
+        <h2>
+        <form action="/login" method="post">
+          <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" class="form-control" id="username" placeholder="Enter username" name="username" >
+          </div>
+
+          <div class="form-group">
+            <label for="pwd">Password:</label>
+            <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="password" >
+          </div>
+
+          <div id="bottombutton">
+            <button type="submit" class="btn btn-success" ><h4>Login</h4></button>
+          </div>
+        </form>
+        <p class="centerwale">Don't have an account, <a href="/register">Register</a></p>
+        </h2>
+      </div>
+    </div>
+{% endblock body %}

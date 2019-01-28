@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block title %}Verify{% endblock title %}
+
+{% block body %}
+    <div class="container" id="mainblock">
+      <div class="jumbotron" >
+        <h1>Goodreads</h1>
+        <p>Goodreads is a "social cataloging" website that allows individuals to freely search its database of books, annotations, and reviews.<br>
+        The website's office is located in Room no. 39 of Castle Dio.</p>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="well well-lg">
+      <h1 class="centerwale">Verify</h1>
+          {% if error %}
+          <div class="alert alert-danger">
+          <strong>Error!</strong> {{ error }}
+          </div>
+          {% endif %}
+<h2>
+      <form action="/confirm" method="post">
+
+
+        <div class="form-group">
+            <h3 style="text-align: center;">Enter the verification code send to {{ email }}</h3>
+            <h5 style="text-align: center;">Please check your spam folder</h5>
+          <input type="text" class="form-control" id="username" placeholder="Enter verification code" name="otp">
+        </div>
+
+        <button type="submit" class="btn btn-success"><h4>Verify</h4></button>
+
+      </form>
+</h2>
+      </div>
+    </div>
+{% endblock body %}
