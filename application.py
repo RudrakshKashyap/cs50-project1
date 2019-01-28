@@ -92,7 +92,7 @@ def verify():
     session["hashed_email"] = bcrypt.generate_password_hash(session["email"]).decode('utf-8')
     server = smtplib.SMTP("smtp.gmail.com", 587)
     server.starttls()
-    server.login("200rudra@gmail.com", "qsglhfksztmvznry")
+    server.login("200rudra@gmail.com", "os.getenv("app_password")
     server.sendmail("200rudra@gmail.com", session["email"], session["hashed_email"])
     print(session["email"])
 
