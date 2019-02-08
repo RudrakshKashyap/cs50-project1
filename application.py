@@ -1,9 +1,12 @@
 import os
-import smtplib
+from gmail import *
 import requests
 import datetime
+from random import randint
 
-from flask import Flask, session, render_template, request, redirect, url_for, jsonify
+from forms import RegistrationForm, LoginForm, VerifyForm
+
+from flask import Flask, session, render_template, request, redirect, url_for, jsonify, flash
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -18,6 +21,7 @@ if not os.getenv("DATABASE_URL"):
 # Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 Session(app)
 
 # Set up database
@@ -26,18 +30,9 @@ db = scoped_session(sessionmaker(bind=engine))
 
 bcrypt = Bcrypt()
 
-"""ERROR"""
-
-
-@app.before_first_request
-def init_app():
-    session["loggedin"] = "False"
-
-
 @app.route("/")
 def index():
-    return redirect("/login")
-
+    return redirect('/home')
 
 @app.route("/home")
 def home():
@@ -45,71 +40,59 @@ def home():
         session["loggedin"] == "False"
     except KeyError:
         return redirect("/login")
-    if session["loggedin"] == "False":
-        return redirect("/login")
-    books = []
-    mylist = db.execute("SELECT book FROM review  GROUP BY book").fetchall()
-    print(mylist)
-    for book in mylist:
-        value = db.execute("SELECT * FROM books WHERE isbn = :book", {"book": book[0]}).fetchone()
-        books.append(value)
-        print(books)
-    return render_template("index.html", name=session["username"], books=books)
+    if session["loggedin"] == "True":
+        books = []
+        mylist = db.execute("SELECT book FROM review  GROUP BY book").fetchall()
+        print(mylist)
+        for book in mylist:
+            value = db.execute("SELECT * FROM books WHERE isbn = :book", {"book": book[0]}).fetchone()
+            books.append(value)
+            print(books)
+        return render_template("index.html", name=session["username"], books=books)
+    return redirect("/login")
 
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    if request.method == "GET":
-        return render_template("register.html")
-    session["username"] = request.form.get("username")
-    if not session["username"]:
-        return render_template("register.html", error="Please provide username")
-    session["email"] = request.form.get("email")
-    if not session["email"]:
-        return render_template("register.html", error="Please provide email")
-    session["password"] = request.form.get("password")
-    if not session["password"]:
-        return render_template("register.html", error="Please provide password")
-    confirm_password = request.form.get("confirm_password")
-    if session["password"] != confirm_password:
-        return render_template("register.html", error="Password not match")
-    user = db.execute("SELECT username FROM users").fetchall()
-    if session["username"] == user:
-        return render_template("register.html", error="Username taken")
-    session["loggedin"] = "Register"
-    return redirect("/verify")
+    form = RegistrationForm()
+    verifyform = VerifyForm()
+    if form.validate_on_submit():
+        user = db.execute("SELECT username FROM users where username = :username", {'username': form.username.data}).fetchone()
+        email = db.execute("SELECT email FROM users where email = :email", {'email': form.email.data}).fetchone()
+        if user:
+            flash('Username taken!', 'danger')
+            return render_template("register.html", form = form)
+        if email:
+            flash('An account with this email id already exist!', 'danger')
+            return render_template("register.html", form = form)
+        session['otp'] = randint(99999,999999)
+        session['username'] = form.username.data
+        session['email'] = form.email.data
+        session['password'] = form.password.data
+        subject = 'Goodreads'
+        mail = GMail(subject + ' <200rudra@gmail.com>', os.getenv("password"))
+        msg = Message('verify your email', to=form.email.data,
+                      text = f"use {session['otp']} as your verification code")
+        mail.send(msg)
+        return render_template("verify.html", email=session['email'], verifyform = verifyform)
+    return render_template("register.html", form = form)
 
 
-@app.route("/verify")
+@app.route('/verify', methods=['POST'])
 def verify():
-    try:
-        session["loggedin"] == "Register"
-    except KeyError:
-        return redirect("/login")
-    if session["loggedin"] == "Register":
-        return redirect("/register")
+    verifyform = VerifyForm()
+    if verifyform.validate_on_submit():
+        session['loggedin'] = 'True'
+        if session['otp'] == verifyform.otp.data:
+            db.execute("INSERT INTO users (username, email, password) VALUES (:username, :email, :password)",
+                {"username": session["username"], "email": session['email'],
+                    "password": session['password']})
+            db.commit()
+            flash(f"Account created for {session['username']}!", 'success')
+            return redirect(url_for('home'))
+        flash("verification code didn't match", 'danger')
+    return render_template("verify.html", email=session['email'], verifyform = verifyform)
 
-    session["hashed_email"] = bcrypt.generate_password_hash(session["email"]).decode('utf-8')
-    server = smtplib.SMTP("smtp.gmail.com", 587)
-    server.starttls()
-    server.login("200rudra@gmail.com", "os.getenv("app_password")
-    server.sendmail("200rudra@gmail.com", session["email"], session["hashed_email"])
-    print(session["email"])
-
-    return render_template("verify.html",email = session["email"])
-
-
-@app.route("/confirm", methods = ["POST"])
-def confirm():
-    session["otp"] = request.form.get("otp")
-    if session["hashed_email"] == session["otp"]:
-        db.execute("INSERT INTO users (username, email, password) VALUES (:username, :email, :password)",
-            {"username": session["username"], "email": session["email"], "password": session["password"]})
-        db.commit()
-        session["loggedin"] = "True"
-    else:
-        return render_template("verify.html",error = "verification code not match")
-    return redirect("/")
 
 @app.route("/logout")
 def logout():
@@ -118,16 +101,16 @@ def logout():
 
 @app.route("/login", methods = ["GET","POST"])
 def login():
-    if request.method == "GET":
-        return render_template("login.html")
-    session["username"] = request.form.get("username")
-    session["password"] = request.form.get("password")
-    """ERROR"""
-    if not db.execute("SELECT * FROM users WHERE username = :username AND password = :password",
-            {"username": session["username"], "password": session["password"]}).fetchone() or not session["username"] or not session["password"]:
-        return render_template("login.html",error = "Invalid username or password")
-    session["loggedin"] = "True"
-    return redirect("/home")
+    form = LoginForm()
+    if form.validate_on_submit():
+        if not db.execute("SELECT * FROM users WHERE username = :username AND password = :password",
+                {"username": form.username.data, "password": form.password.data}).fetchone():
+            flash('Invalid username or password !', 'danger')
+            return render_template('login.html', form = form)
+        session["loggedin"] = "True"
+        session['username'] = form.username.data
+        return redirect("/home")
+    return render_template('login.html', form = form)
 
 
 @app.route("/search",methods = ["POST"])
@@ -208,4 +191,8 @@ def book_api(isbn):
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return "seems like you lost in space"
+    return render_template('404.html')
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080, debug=True)
