@@ -3,7 +3,6 @@
 {% block title %}Verify{% endblock title %}
 
 {% block body %}
-    <div class="container" id="mainblock">
       <div class="jumbotron" >
         <h1>Goodreads</h1>
         <p>Goodreads is a "social cataloging" website that allows individuals to freely search its database of books, annotations, and reviews.<br>
@@ -12,25 +11,26 @@
     </div>
 
     <div class="container">
-      <div class="well well-lg">
-      <h1 class="centerwale">Verify</h1>
-          {% if error %}
-          <div class="alert alert-danger">
-          <strong>Error!</strong> {{ error }}
-          </div>
-          {% endif %}
+      <div class="well well-lg"
 <h2>
-      <form action="/confirm" method="post">
-
-
+      <form action='/verify' method="post">
+          {{ verifyform.hidden_tag() }}
         <div class="form-group">
-            <h3 style="text-align: center;">Enter the verification code send to {{ email }}</h3>
-            <h5 style="text-align: center;">Please check your spam folder</h5>
-          <input type="text" class="form-control" id="username" placeholder="Enter verification code" name="otp">
+            <h3 class='centerwale'>Enter the verification code sent to {{ email }}</h3>
+            {% if verifyform.otp.errors %}
+                {{ verifyform.otp(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for verifyerror in verifyform.otp.errors %}
+                    <span>{{ verifyerror }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ verifyform.otp(class="form-control form-control-lg", autofocus) }}
+            {% endif %}
         </div>
-
-        <button type="submit" class="btn btn-success"><h4>Verify</h4></button>
-
+        <div class="form-group">
+            {{ verifyform.submit(class="btn-lg btn-success") }}
+        </div>
       </form>
 </h2>
       </div>

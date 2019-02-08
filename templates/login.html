@@ -3,7 +3,6 @@
 {% block title %}Login{% endblock title %}
 
 {% block body %}
-    <div class="container" id="mainblock">
       <div class="jumbotron">
         <a href="/register" ><button type="button" class="btn btn-primary" ><h4>Register</h4></button></a>
         <h1>Goodreads</h1>
@@ -15,28 +14,48 @@
 
     <div class="container">
       <div class="well well-lg">
-        <h1 class="centerwale">Login</h1>
-          {% if error %}
-          <div class="alert alert-danger">
-          <strong>Error!</strong> {{ error }}
-          </div>
-          {% endif %}
         <h2>
-        <form action="/login" method="post">
-          <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" class="form-control" id="username" placeholder="Enter username" name="username" >
-          </div>
-
-          <div class="form-group">
-            <label for="pwd">Password:</label>
-            <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="password" >
-          </div>
-
-          <div id="bottombutton">
-            <button type="submit" class="btn btn-success" ><h4>Login</h4></button>
-          </div>
-        </form>
+            <form action="" method="post">
+                {{ form.hidden_tag() }}
+              <fieldset class="form-group">
+                  <legend class="border-bottom centerwale mb-4"><h1>Login</h1></legend>
+                  <div class="form-group">
+                      {{ form.username.label(class="form-control-label")  }}
+                      {% if form.username.errors %}
+                          {{ form.username(class="form-control form-control-lg is-invalid", placeholder='Enter username') }}
+                          <div class="invalid-feedback">
+                              {% for error in form.username.errors %}
+                              <span>{{ error }}</span>
+                              {% endfor %}
+                          </div>
+                      {% else %}
+                          {{ form.username(class="form-control form-control-lg", placeholder='Enter username') }}
+                      {% endif %}
+                  </div>
+                  <div class="form-group">
+                      {{ form.password.label(class="form-control-label")  }}
+                      {% if form.password.errors %}
+                          {{ form.password(class="form-control form-control-lg is-invalid", placeholder='Enter password') }}
+                          <div class="invalid-feedback">
+                              {% for error in form.password.errors %}
+                              <span>{{ error }}</span>
+                              {% endfor %}
+                          </div>
+                      {% else %}
+                          {{ form.password(class="form-control form-control-lg", placeholder='Enter password') }}
+                      {% endif %}
+                  </div>
+                  <!--
+                  i don't know how to use this
+                  <div class='form-check'>
+                      <h4>{{ form.remember.label(class='form-check-label') }} &nbsp; {{ form.remember(class='form-check-input') }}</h4>
+                  </div>
+                  -->
+              </fieldset>
+              <div class="form-group">
+                  {{ form.submit(class="btn-lg btn-success") }}
+              </div>
+            </form>
         <p class="centerwale">Don't have an account, <a href="/register">Register</a></p>
         </h2>
       </div>
