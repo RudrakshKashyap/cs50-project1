@@ -11,6 +11,8 @@ Jinja2==2.10
 MarkupSafe==1.1.0
 python-engineio==3.2.3
 python-socketio==3.1.1
+psycopg2==2.7.6.1
+psycopg2-binary==2.7.7
 requests==2.18.4
 requests-unixsocket==0.1.5
 SQLAlchemy==1.2.17
