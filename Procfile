@@ -1,1 +1,1 @@
-web: gunicorn cs50-project1:application
+web: gunicorn application:app
