@@ -9,8 +9,6 @@ gunicorn==19.9.0
 itsdangerous==1.1.0
 Jinja2==2.10
 MarkupSafe==1.1.0
-python-apt==1.6.3+ubuntu1
-python-debian==0.1.32
 python-engineio==3.2.3
 python-socketio==3.1.1
 SQLAlchemy==1.2.17
